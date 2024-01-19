@@ -1,19 +1,9 @@
 # imports
 from src.shifrs import Shifer
 import sqlite3 as sq
-
+from src.config import sql1, sql2, sql3, sql4, sql5, sql6
 # shifrs
 sh = Shifer()
-
-# sqlSHABL
-
-sql1 = "INSERT INTO users (Name, Password) VALUES (?,?);"
-sql2 = "SELECT * FROM users WHERE Name==?;"
-sql3 = "INSERT INTO data (Name, Password) VALUES (?,?);"
-sql4 = "DELETE FROM data WHERE Name==? and Password==?;"
-sql5 = "SELECT * FROM data;"
-sql6 = "DELETE FROM data;"
-# FUNCS
 
 
 # classes
@@ -73,25 +63,24 @@ class Manager:
     def del_all(self):
         self.cursor.execute(sql6)
         self.connection.commit()
-        
+
     def output(self):
         res = list()
-        pas=""
-        name=""
+        pas = ""
+        name = ""
         self.cursor.execute(sql5)
         records = self.cursor.fetchall()
         for i in records:
             for j in range(len(i)):
                 if j % 3 != 0:
                     if j % 2 == 0:
-                        pas=sh.uncezar(i[j], 4)
+                        pas = sh.uncezar(i[j], 4)
                     else:
-                        name=i[j]
-                    if name!="" and pas!="":  
-                        tmp=f"Логин - {name} Пароль - {pas}"
+                        name = i[j]
+                    if name != "" and pas != "":
+                        tmp = f"Логин - {name} Пароль - {pas}"
                         res.append(tmp)
-                        name=""
-                        pas=""
-   
-                    
+                        name = ""
+                        pas = ""
+
         return res

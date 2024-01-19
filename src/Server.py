@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, abort
 from src.app import User, Manager
-
+from src.config import port
 app = Flask(__name__)
 
 autoris = False
@@ -11,12 +11,12 @@ def wlc():
     if request.method == "POST":
         try:
             if request.form["inside"] == "":
-                return redirect("http://127.0.0.1:5000/inside")
+                return redirect(f"http://127.0.0.1:{port}/inside")
             else:
                 return "1"
         except:
             if request.form["reg"] == "":
-                return redirect("http://127.0.0.1:5000/registation")
+                return redirect(f"http://127.0.0.1:{port}/registation")
             else:
                 return "1"
     elif request.method == "GET":
@@ -33,7 +33,7 @@ def input():
             name_user = usr.get()[0]
             del usr
             autoris = True
-            return redirect(f"http://127.0.0.1:5000/autoris/{name_user}")
+            return redirect(f"http://127.0.0.1:{port}/autoris/{name_user}")
         return render_template("index1.html")
     elif request.method == "GET":
         return render_template("index1.html")
@@ -46,7 +46,7 @@ def reg():
         usr = User(login, password)
         if usr.reg():
             del usr
-            return redirect("http://127.0.0.1:5000/inside")
+            return redirect(f"http://127.0.0.1:{port}/inside")
         else:
             return render_template("index2.html")
     elif request.method == "GET":
@@ -56,9 +56,9 @@ def reg():
 @app.route("/autoris/<name>", methods=["POST", "GET"])
 def autorisation(name):
     if request.method == "POST" and autoris:
-        return redirect("http://127.0.0.1:5000/main_page")
+        return redirect(f"http://127.0.0.1:{port}/main_page")
     elif request.method == "GET" and autoris:
-        return redirect("http://127.0.0.1:5000/main_page")
+        return redirect(f"http://127.0.0.1:{port}/main_page")
     else:
         return abort(405)
 
@@ -76,7 +76,7 @@ def main():
             mng.set(login,password)
             mng.save()
                 
-        return redirect("http://127.0.0.1:5000/main_page")
+        return redirect(f"http://127.0.0.1:{port}/main_page")
     
     elif request.method == "GET" and autoris:
         data=mng.output()
