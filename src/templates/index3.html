@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Менеджер</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+        }
+
+        #add_ps {
+            margin: 20px auto;
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #add_ps label,
+        #add_ps input,
+        #add_ps button {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #spisok_ps {
+            margin: 20px auto;
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #spisok_ps p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="add_ps">
+        <form id="auth" action="" method="post"></form>
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" name="login" form="auth" required>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="pswrd" form="auth" required>
+        <button type="submit" form="auth">Добавить</button>
+        <button type="submit" name="del" form="auth">Удалить</button>
+    </div>
+
+    <div id="spisok_ps">
+        <p>Логин и пароль</p>
+        {% for i in data %}
+        <li>{{i}}</li>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
