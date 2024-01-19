@@ -17,7 +17,7 @@ class User:
 
     def auth(self):
         try:
-            self.cursor.execute(sql2, (self.name))
+            self.cursor.execute(sql2, (self.name,))
             records = self.cursor.fetchall()
             for i in records:
                 if i[1] == self.name and i[2] == self.ps:
