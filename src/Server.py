@@ -2,9 +2,7 @@ from flask import Flask, request, render_template, redirect, abort
 from src.app import User, Manager
 from src.config import port
 app = Flask(__name__)
-
-autoris = False
-mng=Manager()
+user="obj"
 
 @app.route("/", methods=["POST", "GET"])
 def wlc():
@@ -25,14 +23,14 @@ def wlc():
 
 @app.route("/inside", methods=["POST", "GET"])
 def input():
-    global autoris
+    global user
     if request.method == "POST":
         login, password = request.form["login"], request.form["pass"]
         usr = User(login, password)
+        user=User(login, password)
         if usr.auth():
             name_user = usr.get()[0]
             del usr
-            autoris = True
             return redirect(f"http://127.0.0.1:{port}/autoris/{name_user}")
         return render_template("index1.html")
     elif request.method == "GET":
@@ -55,17 +53,18 @@ def reg():
 
 @app.route("/autoris/<name>", methods=["POST", "GET"])
 def autorisation(name):
-    if request.method == "POST" and autoris:
-        return redirect(f"http://127.0.0.1:{port}/main_page")
-    elif request.method == "GET" and autoris:
-        return redirect(f"http://127.0.0.1:{port}/main_page")
+    if request.method == "POST":
+        return redirect(f"http://127.0.0.1:{port}/main_page/{name}")
+    elif request.method == "GET":
+        return redirect(f"http://127.0.0.1:{port}/main_page/{name}")
     else:
         return abort(405)
 
 
-@app.route("/main_page", methods=["POST", "GET"])
-def main():
-    if request.method == "POST" and autoris:
+@app.route("/main_page/<name>", methods=["POST", "GET"])
+def main(name):
+    mng=Manager(name,user)
+    if request.method == "POST" and mng.chek_usr_auth(name):
         try:
             login, password = request.form["login"], request.form["pswrd"]
             if request.form["del"]=="":
@@ -76,9 +75,9 @@ def main():
             mng.set(login,password)
             mng.save()
                 
-        return redirect(f"http://127.0.0.1:{port}/main_page")
+        return redirect(f"http://127.0.0.1:{port}/main_page/{name}")
     
-    elif request.method == "GET" and autoris:
+    elif request.method == "GET" and mng.chek_usr_auth(name):
         data=mng.output()
         return render_template("index3.html",data=data)
     else:

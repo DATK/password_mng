@@ -1,7 +1,7 @@
 # imports
 from src.shifrs import Shifer
 import sqlite3 as sq
-from src.config import sql1, sql2, sql3, sql4, sql5, sql6
+from src.config import sql1, sql2, sql3, sql4, sql5, sql6, sql7, sql8
 # shifrs
 sh = Shifer()
 
@@ -10,10 +10,18 @@ sh = Shifer()
 class User:
 
     def __init__(self, name: str, ps: str):
-        self.connection = sq.connect('./sql/USERS_DATABASE.db')
+        self.connection = sq.connect('./sql/USERS_DATABASE.db', check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.name = name
         self.ps = sh.hashing(ps)
+        self.create_db()
+        
+    def create_db(self):
+        try:
+            self.cursor.execute(sql8)
+            self.connection.commit()
+        except sq.OperationalError:
+            return 1
 
     def auth(self):
         try:
@@ -41,12 +49,14 @@ class User:
 
 class Manager:
 
-    def __init__(self):
-        self.connection = sq.connect(
-            './sql/manager.db', check_same_thread=False)
-        self.cursor = self.connection.cursor()
+    def __init__(self, db, user: object):
+        self.user = user
         self.name = ""
         self.passworsd = ""
+        self.connection = sq.connect(
+            f'./sql/{db}.db', check_same_thread=False)
+        self.cursor = self.connection.cursor()
+        self.create_table()
 
     def save(self):
         self.cursor.execute(sql3, (self.name, self.password))
@@ -55,6 +65,19 @@ class Manager:
     def set(self, name, password):
         self.password = sh.cezar(password, 4)
         self.name = name
+
+    def chek_usr_auth(self, nm):
+        if self.user.get()[0] == nm and self.user.auth():
+            return True
+        else:
+            return False
+
+    def create_table(self):
+        try:
+            self.cursor.execute(sql7)
+            self.connection.commit()
+        except sq.OperationalError:
+            return 1
 
     def del_dt(self):
         self.cursor.execute(sql4, (self.name, self.password))
@@ -84,3 +107,6 @@ class Manager:
                         pas = ""
 
         return res
+
+    def __del__(self):
+        self.connection.close()
