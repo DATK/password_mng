@@ -1,9 +1,14 @@
 from flask import Flask, request, render_template, redirect, abort
+from random import randint
+import json
 from src.app import User, Manager
-from src.config import port
+from src.config import port,ip
 app = Flask(__name__)
-user="obj"
-ip="localhost"
+
+users_ident={}
+#"name_user:[randkey,user]"
+
+
 @app.route("/", methods=["POST", "GET"])
 def wlc():
     if request.method == "POST":
@@ -23,13 +28,17 @@ def wlc():
 
 @app.route("/inside", methods=["POST", "GET"])
 def input():
-    global user
     if request.method == "POST":
         login, password = request.form["login"], request.form["pass"]
         usr = User(login, password)
-        user=User(login, password)
         if usr.auth():
             name_user = usr.get()[0]
+            tmp=randint(10000000,99999999999)
+            if login not in users_ident:      
+                users_ident[login]=[f"{tmp}",usr]
+            else:
+                del usr
+                return "Вы уже вошли в аккаунт на другом устройстве"
             del usr
             return redirect(f"http://{ip}:{port}/autoris/{name_user}")
         return render_template("index1.html")
@@ -51,19 +60,24 @@ def reg():
         return render_template("index2.html")
 
 
-@app.route("/autoris/<name>", methods=["POST", "GET"])
+@app.route("/autoris/<name>", methods=["GET"])
 def autorisation(name):
-    if request.method == "POST":
-        return redirect(f"http:/{ip}:{port}/main_page/{name}")
-    elif request.method == "GET":
-        return redirect(f"http://{ip}:{port}/main_page/{name}")
+    global users_ident
+    if request.method == "GET":
+        return redirect(f"http://{ip}:{port}/main_page/{name}/{users_ident[name][0]}")
     else:
         return abort(405)
 
 
-@app.route("/main_page/<name>", methods=["POST", "GET"])
-def main(name):
-    mng=Manager(name,user)
+@app.route("/main_page/<name>/<key>", methods=["POST", "GET"])
+def main(name,key):
+    try:
+        mng=Manager(name,users_ident[name][-1])
+    except KeyError:
+        return ("Выполните повторный вход")
+    print(key,users_ident[name])
+    if key!=users_ident[name][0]:
+        return abort(403)
     if request.method == "POST" and mng.chek_usr_auth(name):
         try:
             login, password = request.form["login"], request.form["pswrd"]
@@ -74,8 +88,9 @@ def main(name):
             login, password = request.form["login"], request.form["pswrd"]
             mng.set(login,password)
             mng.save()
-                
-        return redirect(f"http://{ip}:{port}/main_page/{name}")
+        tmp=randint(10000000,99999999999)
+        users_ident[name][0]=str(tmp)
+        return redirect(f"http://{ip}:{port}/main_page/{name}/{tmp}")
     
     elif request.method == "GET" and mng.chek_usr_auth(name):
         data=mng.output()

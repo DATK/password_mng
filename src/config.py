@@ -1,4 +1,4 @@
-debug = True
+debug = 0
 port = 6070
 host="0.0.0.0"
 ip="192.168.1.104"
