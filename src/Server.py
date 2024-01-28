@@ -80,6 +80,12 @@ def main(name,key):
         return abort(403)
     if request.method == "POST" and mng.chek_usr_auth(name):
         try:
+            if request.form["exit"]=="":
+                del users_ident[name]
+                return redirect(f"http://{ip}:{port}/")
+        except:
+            pass
+        try:
             login, password = request.form["login"], request.form["pswrd"]
             if request.form["del"]=="":
                 mng.set(login,password)
