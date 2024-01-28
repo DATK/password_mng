@@ -1,8 +1,8 @@
 from src.Server import app
 import webbrowser
-from src.config import debug, port
+from src.config import debug, port, host,ip
 
 if __name__=="__main__":
-    webbrowser.open(f'http://127.0.0.1:{port}', new=1)
-    app.run(debug=debug,port=port)
+    webbrowser.open(f'http://{ip}:{port}')
+    app.run(debug=debug,port=port,host=host)
       

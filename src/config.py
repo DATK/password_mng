@@ -1,5 +1,7 @@
 debug = True
 port = 6070
+host="0.0.0.0"
+ip="192.168.1.104"
 
 
 sql1 = "INSERT INTO users (Name, Password) VALUES (?,?);"
