@@ -1,10 +1,24 @@
 # imports
 from src.shifrs import Shifer
 import sqlite3 as sq
+from random import randint
 from src.config import sql1, sql2, sql3, sql4, sql5, sql6, sql7, sql8
 # shifrs
 sh = Shifer()
 
+#functions
+
+def generate_adres():
+    alf="qwertyuioplkjhgfdsazxcvbnm./123QWE456ASD7890ZXCRFVTGBYHNUJMIKOLP)"
+    adres=""
+    tmp=""
+    for i in range(randint(3,7)):
+        for j in range(randint(6,15)):
+            tmp+=alf[randint(0,len(alf))-1]
+        adres+=f"{tmp}/"
+        tmp=""
+    return adres
+        
 
 # classes
 class User:

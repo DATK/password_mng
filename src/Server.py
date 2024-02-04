@@ -1,12 +1,12 @@
 from flask import Flask, request, render_template, redirect, abort
 from random import randint
 import json
-from src.app import User, Manager
+from src.app import User, Manager, generate_adres
 from src.config import port,ip
 app = Flask(__name__)
 
 users_ident={}
-#"name_user:[randkey,user]"
+#"name_user:[randkey,tmp_adres,user]"
 
 
 @app.route("/", methods=["POST", "GET"])
@@ -33,9 +33,10 @@ def input():
         usr = User(login, password)
         if usr.auth():
             name_user = usr.get()[0]
-            tmp=randint(10000000,99999999999)
-            if login not in users_ident:      
-                users_ident[login]=[f"{tmp}",usr]
+            if login not in users_ident:  
+                tmp=randint(10000000,99999999999)
+                tmp_adr=generate_adres()    
+                users_ident[login]=[f"{tmp}",tmp_adr,usr]
             else:
                 del usr
                 return "Вы уже вошли в аккаунт на другом устройстве"
@@ -64,18 +65,18 @@ def reg():
 def autorisation(name):
     global users_ident
     if request.method == "GET":
-        return redirect(f"http://{ip}:{port}/main_page/{name}/{users_ident[name][0]}")
+        return redirect(f"http://{ip}:{port}/main_page/{name}/{users_ident[name][1]}/{users_ident[name][0]}")
     else:
         return abort(405)
 
 
-@app.route("/main_page/<name>/<key>", methods=["POST", "GET"])
-def main(name,key):
+@app.route("/main_page/<name>/<path:adres>/<key>", methods=["POST", "GET"])
+def main(name,key,adres):
     try:
         mng=Manager(name,users_ident[name][-1])
     except KeyError:
         return ("Выполните повторный вход")
-    print(key,users_ident[name])
+    #print(key,users_ident[name])
     if key!=users_ident[name][0]:
         return abort(403)
     if request.method == "POST" and mng.chek_usr_auth(name):
@@ -96,7 +97,7 @@ def main(name,key):
             mng.save()
         tmp=randint(10000000,99999999999)
         users_ident[name][0]=str(tmp)
-        return redirect(f"http://{ip}:{port}/main_page/{name}/{tmp}")
+        return redirect(f"http://{ip}:{port}/main_page/{name}/{users_ident[name][1]}/{tmp}")
     
     elif request.method == "GET" and mng.chek_usr_auth(name):
         data=mng.output()
