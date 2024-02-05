@@ -77,7 +77,7 @@ def main(name,key,adres):
     except KeyError:
         return ("Выполните повторный вход")
     #print(key,users_ident[name])
-    if key!=users_ident[name][0]:
+    if key!=users_ident[name][0] and adres!=users_ident[name][1]:
         return abort(403)
     if request.method == "POST" and mng.chek_usr_auth(name):
         try:
@@ -96,7 +96,9 @@ def main(name,key,adres):
             mng.set(login,password)
             mng.save()
         tmp=randint(10000000,99999999999)
+        tmp_adr=generate_adres()
         users_ident[name][0]=str(tmp)
+        users_ident[name][1]=str(tmp_adr)
         return redirect(f"http://{ip}:{port}/main_page/{name}/{users_ident[name][1]}/{tmp}")
     
     elif request.method == "GET" and mng.chek_usr_auth(name):
